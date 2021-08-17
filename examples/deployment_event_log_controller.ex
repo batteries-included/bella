@@ -6,15 +6,12 @@ defmodule DeploymentEventLogController do
   This controller simply logs lifecycle events on Deployments.
   """
   require Logger
-  use Bonny.Controller
+  use Bella.Controller
 
-  @group "apps"
-  @version "v1"
-  @names %{
-    plural: "deployments",
-    singular: "deployment",
-    kind: "Deployment"
-  }
+  @impl true
+  def operation() do
+    K8s.Client.list("reconciler.test.foos/v1", :foos)
+  end
 
   @impl true
   def reconcile(resource) do

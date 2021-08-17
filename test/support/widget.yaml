@@ -6,10 +6,3 @@ metadata:
     foo: bar
 spec:
   whizbangs: 3
----
-apiVersion: example.com/v1
-kind: Cog
-metadata:
-  name: test-cog
-spec:
-  levers: 9000

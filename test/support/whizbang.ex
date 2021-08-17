@@ -1,7 +1,7 @@
 # credo:disable-for-this-file
 defmodule Whizbang do
   @moduledoc false
-  use Bonny.Controller
+  use Bella.Controller
   use Agent
 
   def start_link() do
@@ -30,13 +30,16 @@ defmodule Whizbang do
   def delete(evt), do: put({:deleted, evt})
   @impl true
   def reconcile(evt), do: put({:reconciled, evt})
+
+  @impl true
+  def operation() do
+    K8s.Client.list("bella", "v1", "Whizbang")
+  end
 end
 
 defmodule V1.Whizbang do
   @moduledoc false
-  use Bonny.Controller
-  @kind "Whizzo"
-  @names %{kind: "Whizzo"}
+  use Bella.Controller
 
   @impl true
   def add(_), do: :ok
@@ -46,23 +49,16 @@ defmodule V1.Whizbang do
   def delete(_), do: :ok
   @impl true
   def reconcile(_), do: :ok
+
+  @impl true
+  def operation() do
+    K8s.Client.list("bella/v1", "Whizbang")
+  end
 end
 
 defmodule V2.Whizbang do
   @moduledoc false
-  use Bonny.Controller
-
-  @rule {"apiextensions.k8s.io", ["bar"], ["*"]}
-  @rule {"apiextensions.k8s.io", ["foo"], ["*"]}
-
-  @group "kewl.example.io"
-  @scope :cluster
-  @names %{
-    plural: "bars",
-    singular: "qux",
-    kind: "Foo",
-    shortNames: ["f", "b", "q"]
-  }
+  use Bella.Controller
 
   @impl true
   def add(_), do: :ok
@@ -72,28 +68,16 @@ defmodule V2.Whizbang do
   def delete(_), do: :ok
   @impl true
   def reconcile(_), do: :ok
+
+  @impl true
+  def operation() do
+    K8s.Client.list("bella/v2", "Whizbang")
+  end
 end
 
 defmodule V3.Whizbang do
   @moduledoc false
-  use Bonny.Controller
-
-  @version "v3alpha1"
-  @group "kewl.example.io"
-  @scope :cluster
-  @names %{
-    plural: "foos",
-    singular: "foo",
-    kind: "Foo"
-  }
-  @additional_printer_columns [
-    %{
-      name: "test",
-      type: "string",
-      description: "test",
-      JSONPath: ".spec.test"
-    }
-  ]
+  use Bella.Controller
 
   @impl true
   def add(_), do: :ok
@@ -103,4 +87,9 @@ defmodule V3.Whizbang do
   def delete(_), do: :ok
   @impl true
   def reconcile(_), do: :ok
+
+  @impl true
+  def operation() do
+    K8s.Client.list("bella/v2", "Whizbang")
+  end
 end
