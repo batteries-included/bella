@@ -1,6 +1,6 @@
 defmodule Bella.MixProject do
   use Mix.Project
-  @version "1.0.0"
+  @version "0.0.1"
   @source_url "https://github.com/batteries-included/bella"
 
   def project do
@@ -13,7 +13,7 @@ defmodule Bella.MixProject do
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test, "coveralls.travis": :test, "coveralls.html": :test],
+      preferred_cli_env: [coveralls: :test, "coveralls.html": :test],
       docs: docs(),
       package: package(),
       dialyzer: [plt_add_apps: [:mix, :eex]],
@@ -39,7 +39,6 @@ defmodule Bella.MixProject do
       {:telemetry, ">= 0.4.0"},
 
       # Dev deps
-      {:mix_test_watch, "~> 0.8", only: :dev, runtime: false},
       {:ex_doc, "~> 0.25.1", only: :dev, runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:credo_envvar, "~> 0.1", only: [:dev, :test], runtime: false},
