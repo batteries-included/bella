@@ -1,10 +1,10 @@
-# Bonny: Kubernetes Controller Framework
+# Bella: Kubernetes Controller Framework
 
-Bonny make it easy to create Kubernetes Controllers.
+Bella make it easy to create Kubernetes Controllers.
 
 ## Installation
 
-Bonny can be installed by adding `bella` to your list of dependencies in `mix.exs`:
+Bella can be installed by adding `bella` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -16,7 +16,7 @@ end
 
 ### Configuration
 
-Bonny uses the [k8s client](https://github.com/coryodaniel/k8s) under the hood.
+Bella uses the [k8s client](https://github.com/coryodaniel/k8s) under the hood.
 
 The only configuration parameters required are `:bella` `controllers` and a `:k8s` cluster:
 
@@ -34,9 +34,9 @@ config :k8s,
 
 ## Telemetry
 
-Bonny uses the `telemetry` and `notion` library to emit event metrics.
+Bella uses the `telemetry` and `notion` library to emit event metrics.
 
-Events: `Bonny.Sys.Event.events()`
+Events: `Bella.Sys.Event.events()`
 
 ```elixir
 [
