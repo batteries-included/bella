@@ -1,4 +1,4 @@
-name: Bonny Tests
+name: Bella Tests
 on: push
 jobs:
   build:
