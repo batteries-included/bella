@@ -45,7 +45,7 @@ defmodule Bella.MixProject do
       {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       # Test deps
-      {:excoveralls, "~> 0.12", only: :test}
+      {:excoveralls, "~> 0.14", only: :test}
     ]
   end
 
