@@ -18,8 +18,6 @@ end
 
 Bella uses the [k8s client](https://github.com/coryodaniel/k8s) under the hood.
 
-The only configuration parameters required are `:bella` `controllers` and a `:k8s` cluster:
-
 ```elixir
 config :k8s,
   clusters: %{
