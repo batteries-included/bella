@@ -34,9 +34,8 @@ defmodule Bella.MixProject do
   defp deps do
     [
       {:jason, "~> 1.1"},
-      {:k8s, "~> 1.0.0"},
-      {:notion, "~> 0.2"},
-      {:telemetry, ">= 0.4.0"},
+      {:k8s, "~> 1.1.0"},
+      {:telemetry, ">= 1.0.0"},
 
       # Dev deps
       {:ex_doc, "~> 0.25.1", only: :dev, runtime: false},

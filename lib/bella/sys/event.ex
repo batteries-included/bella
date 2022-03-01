@@ -1,6 +1,6 @@
 defmodule Bella.Sys.Event do
   @moduledoc false
-  use Notion, name: :bella, metadata: %{}
+  use Bella.Telemetry, name: :bella
 
   defevent([:watcher, :initialized])
   defevent([:watcher, :watch, :started])

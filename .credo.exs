@@ -82,7 +82,7 @@ common_checks = [
           [
             {Credo.Check.Design.DuplicatedCode,
              excluded_macros: [],
-             files: %{excluded: ["apps/control_server/lib/control_server/services/*.ex"]}}
+             files: %{excluded: []}}
           ]
     },
     %{
