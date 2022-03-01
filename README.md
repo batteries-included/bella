@@ -32,9 +32,7 @@ config :k8s,
 
 ## Telemetry
 
-Bella uses the `telemetry` and `notion` library to emit event metrics.
-
-Events: `Bella.Sys.Event.events()`
+Bella uses the `telemetry`  library to emit event metrics.
 
 ```elixir
 [

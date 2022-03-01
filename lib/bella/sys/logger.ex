@@ -19,12 +19,16 @@ defmodule Bella.Sys.Logger do
   def log_handler(event, measurements, metadata, preferred_level) do
     event_name = Enum.join(event, ".")
 
-    level =
-      case Regex.match?(~r/fail|error/, event_name) do
-        true -> :error
-        _ -> preferred_level
-      end
-
+    level = log_level(event, preferred_level)
     Logger.log(level, "[#{event_name}] #{inspect(measurements)} #{inspect(metadata)}")
   end
+
+  defp log_level(event, preferred_level) do
+    case is_error(event) do
+      true -> :error
+      _ -> preferred_level
+    end
+  end
+
+  defp is_error(event), do: Enum.any?(event, fn part -> part == :error || part == :fail end)
 end
