@@ -1,4 +1,5 @@
 defmodule Bella.Watcher.Core do
+  alias Bella.Sys.Event
   alias Bella.Watcher.ResourceVersion
   alias Bella.Watcher.State
 
@@ -62,6 +63,57 @@ defmodule Bella.Watcher.Core do
     end
   end
 
+  def get_before(state) do
+    metadata = State.metadata(state)
+    Event.watcher_first_resource_started(%{}, metadata)
+    {measurements, result} = Event.measure(&first_resources/1, [state])
+    Event.watcher_first_resource_finished(measurements, metadata)
+
+    case result do
+      {:ok, resources} ->
+        _ = async_run(resources, measurements, state)
+
+      {:error, error} ->
+        metadata = Map.put(metadata, :error, error)
+        Event.watcher_first_resource_failed(measurements, metadata)
+    end
+  end
+
+  defp first_resources(%State{connection: conn, watcher: watcher, client: client} = _s) do
+    case watcher.operation() do
+      nil ->
+        {:ok, []}
+
+      op ->
+        client.stream(conn, op)
+    end
+  end
+
+  defp async_run(resources, measurements, %{watcher: watcher, resource_version: rv} = state) do
+    metadata = State.metadata(state)
+
+    resources
+    |> Enum.map(fn
+      resource when is_map(resource) ->
+        Event.reconciler_fetch_succeeded(measurements, metadata)
+
+        case is_before(resource, rv) do
+          true ->
+            do_dispatch(watcher, :add, resource)
+
+          _false ->
+            Task.async(&do_ok/0)
+        end
+
+      {:error, error} ->
+        metadata = Map.put(metadata, :error, error)
+        Event.reconciler_fetch_failed(measurements, metadata)
+    end)
+    |> Task.await_many()
+  end
+
+  defp do_ok, do: :ok
+
   @doc """
   Dispatches an `ADDED`, `MODIFIED`, and `DELETED` events to an controller
   """
@@ -86,6 +138,16 @@ defmodule Bella.Watcher.Core do
     with {:ok, payload} <- client.run(conn, watcher.operation()) do
       rv = ResourceVersion.extract_rv(payload)
       {:ok, rv}
+    end
+  end
+
+  defp is_before(resource, rv) do
+    case ResourceVersion.extract_rv(resource) do
+      {:error, _} ->
+        true
+
+      resource_rv ->
+        String.to_integer(resource_rv) <= String.to_integer(rv)
     end
   end
 end

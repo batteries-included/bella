@@ -46,8 +46,12 @@ defmodule Bella.Watcher.Worker do
   @impl GenServer
   def handle_info(:watch, %State{resource_version: curr_rv} = state) do
     rv = curr_rv || Core.get_resource_version(state)
-
     state = %{state | resource_version: rv}
+
+    if is_first_watch(curr_rv, rv) do
+      Core.get_before(state)
+    end
+
     Event.watcher_watch_started(%{}, State.metadata(state))
     Core.watch(self(), state)
     {:noreply, state}
@@ -112,4 +116,6 @@ defmodule Bella.Watcher.Worker do
   def handle_info(_other, %State{} = state) do
     {:noreply, state}
   end
+
+  defp is_first_watch(previous_rv, new_rv), do: previous_rv == nil && new_rv != nil
 end
