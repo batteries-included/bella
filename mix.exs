@@ -38,7 +38,7 @@ defmodule Bella.MixProject do
       {:telemetry, ">= 1.0.0"},
 
       # Dev deps
-      {:ex_doc, "~> 0.25.1", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.28.0", only: :dev, runtime: false},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:credo_envvar, "~> 0.1", only: [:dev, :test], runtime: false},
       {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false},
