@@ -4,7 +4,7 @@ defmodule Bella.K8sMockClient do
   Mock `K8s.Client`
   """
 
-  def stream(%K8s.Operation{api_version: "reconciler.test.foos/v1"} = _op, _cluster) do
+  def stream(_connection, %K8s.Operation{api_version: "reconciler.test.foos/v1"} = _op) do
     fake_stream = [
       %{"name" => "foo"},
       %{"name" => "bar"}
@@ -13,7 +13,7 @@ defmodule Bella.K8sMockClient do
     {:ok, fake_stream}
   end
 
-  def stream(%K8s.Operation{api_version: "watcher.test/v1"} = _op, _cluster) do
+  def stream(_connection, %K8s.Operation{api_version: "watcher.test/v1"} = _op) do
     fake_stream = [
       %{"name" => "watched"},
       %{"name" => "everything"}
@@ -22,7 +22,7 @@ defmodule Bella.K8sMockClient do
     {:ok, fake_stream}
   end
 
-  def stream(%K8s.Operation{api_version: "reconciler.test.errors/v1"} = _op, _cluster) do
+  def stream(_connection, %K8s.Operation{api_version: "reconciler.test.errors/v1"} = _op) do
     fake_stream = [
       %{"name" => "bar"},
       {:error, :some_error}
@@ -37,7 +37,7 @@ defmodule Bella.K8sMockClient do
     K8s.Operation.build(:list, api_version, name_or_kind, path_params)
   end
 
-  def watch(_op, :test, opts) do
+  def watch(_connection, _op, opts) do
     watcher = opts[:stream_to]
     send_chunk(watcher, added_chunk())
     send_chunk(watcher, deleted_chunk())
@@ -63,17 +63,6 @@ defmodule Bella.K8sMockClient do
       "items" => [%{"page" => 2}]
     }
 
-    {:ok, response}
-  end
-
-  # TODO: remove; Pre 0.4: Mock response for Impl.get_resource_version/1
-  def run(%K8s.Operation{name: "widgets", method: :get, verb: :list}, _, params: %{limit: 1}) do
-    response = %{"metadata" => %{"resourceVersion" => "1337"}}
-    {:ok, response}
-  end
-
-  def run(%K8s.Operation{api_version: "resourceVersion.test/v1"}, _, params: %{limit: 1}) do
-    response = %{"metadata" => %{"resourceVersion" => "1337"}}
     {:ok, response}
   end
 

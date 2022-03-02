@@ -11,7 +11,7 @@ defmodule Bella.Sys.Logger do
   """
   def attach do
     events = Bella.Sys.Event.events()
-    :telemetry.attach_many("bella-events-logger", events, &log_handler/4, :debug)
+    :telemetry.attach_many("bella-events-logger", events, &Bella.Sys.Logger.log_handler/4, :debug)
   end
 
   @doc false
