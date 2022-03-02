@@ -9,7 +9,7 @@ Bella can be installed by adding `bella` to your list of dependencies in `mix.ex
 ```elixir
 def deps do
   [
-    {:bella, "~> 0.0.7"}
+    {:bella, "~> 0.0.8"}
   ]
 end
 ```

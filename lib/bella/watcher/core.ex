@@ -129,7 +129,7 @@ defmodule Bella.Watcher.Core do
 
   @spec do_dispatch(atom, atom, map) :: no_return
   defp do_dispatch(watcher, event, object) do
-    Task.start(fn ->
+    Task.async(fn ->
       apply(watcher, event, [object])
     end)
   end
