@@ -10,9 +10,11 @@ defmodule Bella.Sys.Event do
   defevent([:watcher, :watch, :started])
   defevent([:watcher, :watch, :succeeded])
   defevent([:watcher, :watch, :finished])
+  defevent([:watcher, :watch, :down])
   defevent([:watcher, :watch, :failed])
   defevent([:watcher, :watch, :timedout])
   defevent([:watcher, :chunk, :received])
+  defevent([:watcher, :chunk, :finished])
   defevent([:watcher, :genserver, :down])
 
   defevent([:reconciler, :initialized])

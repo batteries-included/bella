@@ -49,11 +49,13 @@ defmodule Bella.Watcher.Worker do
     state = %{state | resource_version: rv}
 
     if is_first_watch(curr_rv, rv) do
-      Core.get_before(state)
+      _res = Core.get_before(state)
     end
 
     Event.watcher_watch_started(%{}, State.metadata(state))
-    Core.watch(self(), state)
+    {:ok, ref} = Core.watch(self(), state)
+
+    state = %State{state | k8s_watcher_ref: ref}
     {:noreply, state}
   end
 
@@ -75,7 +77,8 @@ defmodule Bella.Watcher.Worker do
 
   @impl GenServer
   def handle_info(%HTTPoison.AsyncChunk{chunk: chunk}, %State{} = state) do
-    Event.watcher_chunk_received(%{}, State.metadata(state))
+    metadata = State.metadata(state)
+    Event.watcher_chunk_received(%{}, metadata)
 
     {lines, buffer} =
       state.buffer
@@ -84,10 +87,15 @@ defmodule Bella.Watcher.Worker do
 
     case Core.process_lines(lines, state) do
       {:ok, new_rv} ->
+        Event.watcher_chunk_finished(%{}, metadata)
         {:noreply, %State{state | buffer: buffer, resource_version: new_rv}}
 
       {:error, :gone} ->
+        Event.watcher_chunk_finished(%{}, metadata)
         {:stop, :normal, state}
+
+      _ ->
+        {:noreply, state}
     end
   end
 
@@ -106,10 +114,20 @@ defmodule Bella.Watcher.Worker do
   end
 
   @impl GenServer
-  def handle_info({:DOWN, _ref, :process, _pid, _reason}, %State{} = state) do
-    Event.watcher_genserver_down(%{}, State.metadata(state))
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, %State{k8s_watcher_ref: k8s_ref} = state) do
+    case ref == k8s_ref do
+      true ->
+        # If the watcher is down then restart it.
+        Event.watcher_watch_down(%{}, State.metadata(state))
+        state = %State{state | k8s_watcher_ref: nil}
 
-    {:stop, :normal, state}
+        send(self(), :watch)
+        {:noreply, state}
+
+      _ ->
+        # Otherwise we assume that it was an async task dispatched to the
+        {:noreply, state}
+    end
   end
 
   @impl GenServer
