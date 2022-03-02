@@ -102,7 +102,7 @@ defmodule Bella.Watcher.Core do
             do_dispatch(watcher, :add, resource)
 
           _false ->
-            Task.completed(:ok)
+            Task.async(&do_ok/0)
         end
 
       {:error, error} ->
@@ -111,6 +111,8 @@ defmodule Bella.Watcher.Core do
     end)
     |> Task.await_many()
   end
+
+  defp do_ok, do: :ok
 
   @doc """
   Dispatches an `ADDED`, `MODIFIED`, and `DELETED` events to an controller
