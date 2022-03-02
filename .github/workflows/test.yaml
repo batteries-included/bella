@@ -5,9 +5,11 @@ jobs:
     strategy:
       matrix:
         include:
+          - elixir: 1.13.0
+            otp: 24.2
+            lint: lint
           - elixir: 1.12.0
             otp: 24.0
-            lint: lint
 
     runs-on: ubuntu-latest
 
@@ -30,8 +32,7 @@ jobs:
           mix deps.get --only test
       - name: Compile
         run: |
-          mix clean
-          mix compile --warnings-as-errors
+          mix compile --warnings-as-errors --force
       - name: Lint
         run: mix credo --strict
         if: ${{ matrix.lint }}

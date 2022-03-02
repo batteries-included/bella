@@ -47,4 +47,11 @@ defmodule Bella.Sys.Event do
 
     {measurements, result}
   end
+
+  def measure(func, args) do
+    {duration, result} = :timer.tc(func, args)
+    measurements = %{duration: duration}
+
+    {measurements, result}
+  end
 end

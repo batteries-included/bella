@@ -80,9 +80,7 @@ common_checks = [
       checks:
         common_checks ++
           [
-            {Credo.Check.Design.DuplicatedCode,
-             excluded_macros: [],
-             files: %{excluded: []}}
+            {Credo.Check.Design.DuplicatedCode, excluded_macros: [], files: %{excluded: []}}
           ]
     },
     %{

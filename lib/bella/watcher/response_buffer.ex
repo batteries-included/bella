@@ -1,4 +1,4 @@
-defmodule Bella.Server.Watcher.ResponseBuffer do
+defmodule Bella.Watcher.ResponseBuffer do
   @moduledoc """
   Buffers streaming responses from HTTPoison and returns kubernetes watch events as JSON
 

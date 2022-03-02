@@ -1,6 +1,6 @@
-defmodule Bella.Server.Watcher.ResponseBufferTest do
+defmodule Bella.Watcher.ResponseBufferTest do
   use ExUnit.Case
-  alias Bella.Server.Watcher.ResponseBuffer
+  alias Bella.Watcher.ResponseBuffer
 
   test "get_lines with nothing" do
     {events, _buffer} =

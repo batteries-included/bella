@@ -1,14 +1,17 @@
-defmodule Bella.Server.WatcherTest do
+defmodule Bella.WatcherTest do
   @moduledoc false
   use ExUnit.Case, async: true
-  alias Bella.Server.Watcher
-  doctest Bella.Server.Watcher
+
+  alias Bella.Watcher
+  alias Bella.Watcher.Worker
+
+  doctest Bella.Watcher
 
   defmodule TestWatcher do
-    use Bella.Server.Watcher, client: Bella.K8sMockClient
+    @behaviour Watcher
 
     @impl true
-    def watch_operation() do
+    def operation() do
       K8s.Client.list("watcher.test/v1", :foos)
     end
 
@@ -32,49 +35,61 @@ defmodule Bella.Server.WatcherTest do
       event = {type, resource}
       Agent.update(TestWatcherCache, fn events -> [event | events] end)
     end
+
+    def start do
+      Agent.start_link(fn -> [] end, name: TestWatcherCache)
+    end
+
+    def get_events do
+      Agent.get(TestWatcherCache, fn events -> events end)
+    end
+  end
+
+  setup do
+    {:ok, _pid} = TestWatcher.start()
+    :ok
   end
 
   test "watch/3" do
-    Agent.start_link(fn -> [] end, name: TestWatcherCache)
-    {:ok, pid} = TestWatcher.start_link()
-    rv = "3"
+    {:ok, pid} =
+      Worker.start_link(watcher: TestWatcher, client: Bella.K8sMockClient, resource_version: "3")
 
-    Watcher.watch(TestWatcher, rv, pid)
+    Watcher.Core.watch(pid, Worker.state(pid))
     Process.sleep(500)
 
-    events = Agent.get(TestWatcherCache, fn events -> events end)
+    events = TestWatcher.get_events()
     refute events == []
   end
 
   describe "dispatch/2" do
     test "dispatches ADDED events to the given module's handler function" do
       evt = event("ADDED")
-      Watcher.dispatch(evt, Whizbang)
+      Watcher.Core.dispatch(evt, TestWatcher)
 
       # Professional.
       :timer.sleep(100)
-      assert [event] = Whizbang.get(:added)
-      assert %{"apiVersion" => "example.com/v1"} = event
+      assert [event] = TestWatcher.get_events()
+      assert {:add, %{"apiVersion" => "example.com/v1"}} = event
     end
 
     test "dispatches MODIFIED events to the given module's handler function" do
       evt = event("MODIFIED")
-      Watcher.dispatch(evt, Whizbang)
+      Watcher.Core.dispatch(evt, TestWatcher)
 
       # Professional.
       :timer.sleep(100)
-      assert [event] = Whizbang.get(:modified)
-      assert %{"apiVersion" => "example.com/v1"} = event
+      assert [event] = TestWatcher.get_events()
+      assert {:modify, %{"apiVersion" => "example.com/v1"}} = event
     end
 
     test "dispatches DELETED events to the given module's handler function" do
       evt = event("DELETED")
-      Watcher.dispatch(evt, Whizbang)
+      Watcher.Core.dispatch(evt, TestWatcher)
 
       # Professional.
       :timer.sleep(100)
-      assert [event] = Whizbang.get(:deleted)
-      assert %{"apiVersion" => "example.com/v1"} = event
+      assert [event] = TestWatcher.get_events()
+      assert {:delete, %{"apiVersion" => "example.com/v1"}} = event
     end
   end
 

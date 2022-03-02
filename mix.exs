@@ -1,6 +1,6 @@
 defmodule Bella.MixProject do
   use Mix.Project
-  @version "0.0.1"
+  @version "0.0.3"
   @source_url "https://github.com/batteries-included/bella"
 
   def project do
@@ -22,7 +22,7 @@ defmodule Bella.MixProject do
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(:dev), do: ["lib", "examples"]
+  defp elixirc_paths(:dev), do: ["lib"]
   defp elixirc_paths(_), do: ["lib"]
 
   def application do
@@ -33,18 +33,18 @@ defmodule Bella.MixProject do
 
   defp deps do
     [
-      {:jason, "~> 1.1"},
+      {:jason, "~> 1.3"},
       {:k8s, "~> 1.1.0"},
       {:telemetry, ">= 1.0.0"},
 
       # Dev deps
-      {:ex_doc, "~> 0.25.1", only: :dev, runtime: false},
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:credo_envvar, "~> 0.1", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.28.2", only: :dev, runtime: false},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:credo_envvar, "~> 0.1.4", only: [:dev, :test], runtime: false},
       {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
       # Test deps
-      {:excoveralls, "~> 0.14", only: :test}
+      {:excoveralls, "~> 0.14.4", only: :test}
     ]
   end
 
