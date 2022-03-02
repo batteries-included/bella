@@ -4,27 +4,32 @@ defmodule Bella.Watcher.Core do
 
   def watch(
         pid,
-        %State{connection: conn, watcher: watcher, client: client, resource_version: rv} = _s
+        %State{
+          connection: conn,
+          watcher: watcher,
+          client: client,
+          resource_version: rv,
+          watch_timeout: watch_timeout
+        } = _s
       ) do
-    timeout = 5 * 60 * 1000
-
     client.watch(conn, watcher.operation(),
       params: %{resourceVersion: rv},
       stream_to: pid,
-      recv_timeout: timeout
+      recv_timeout: watch_timeout
     )
-
-    nil
   end
 
-  def get_resource_version(%State{connection: connection, watcher: watcher, client: client} = _s) do
-    resp = client.get_resource_version(connection, watcher.operation())
+  def get_resource_version(%State{} = state) do
+    resp = fetch_resource_version(state)
 
     case resp do
       {:ok, rv} ->
         rv
 
       {:error, _} ->
+        "0"
+
+      _ ->
         "0"
     end
   end
@@ -75,5 +80,12 @@ defmodule Bella.Watcher.Core do
     Task.start(fn ->
       apply(watcher, event, [object])
     end)
+  end
+
+  defp fetch_resource_version(%{connection: conn, watcher: watcher, client: client} = _state) do
+    with {:ok, payload} <- client.run(conn, watcher.operation()) do
+      rv = ResourceVersion.extract_rv(payload)
+      {:ok, rv}
+    end
   end
 end
