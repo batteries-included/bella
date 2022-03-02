@@ -3,6 +3,10 @@ defmodule Bella.Sys.Event do
   use Bella.Telemetry, name: :bella
 
   defevent([:watcher, :initialized])
+  defevent([:watcher, :first_resource, :started])
+  defevent([:watcher, :first_resource, :finished])
+  defevent([:watcher, :first_resource, :succeeded])
+  defevent([:watcher, :first_resource, :failed])
   defevent([:watcher, :watch, :started])
   defevent([:watcher, :watch, :succeeded])
   defevent([:watcher, :watch, :finished])
