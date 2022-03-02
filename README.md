@@ -9,27 +9,10 @@ Bella can be installed by adding `bella` to your list of dependencies in `mix.ex
 ```elixir
 def deps do
   [
-    {:bella, "~> 0.0.1"}
+    {:bella, "~> 0.0.3"}
   ]
 end
 ```
-
-### Configuration
-
-Bella uses the [k8s client](https://github.com/coryodaniel/k8s) under the hood.
-
-```elixir
-config :k8s,
-  clusters: %{
-    default: %{ # `default` here must match `cluster_name` below
-      conn: "~/.kube/config"
-    }
-  }
-
-  # K8s.Cluster to use, defaults to :default
-  cluster_name: :default
-```
-
 ## Telemetry
 
 Bella uses the `telemetry`  library to emit event metrics.
@@ -53,12 +36,6 @@ Bella uses the `telemetry`  library to emit event metrics.
   [:bella, :watcher, :initialized]
 ]
 ```
-
-## Terminology
-
-_[Controller](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#custom-controllers)_:
-
-> A custom controller is a controller that users can deploy and update on a running cluster, independently of the cluster’s own lifecycle. Custom controllers can work with any kind of resource, but they are especially effective when combined with custom resources. The Operator pattern is one example of such a combination. It allows developers to encode domain knowledge for specific applications into an extension of the Kubernetes API.
 
 ## Testing
 
