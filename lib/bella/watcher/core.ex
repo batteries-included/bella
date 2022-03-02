@@ -13,7 +13,7 @@ defmodule Bella.Watcher.Core do
         } = _s
       ) do
     client.watch(conn, watcher.operation(),
-      params: %{resourceVersion: rv},
+      params: [resourceVersion: rv],
       stream_to: pid,
       recv_timeout: watch_timeout
     )
