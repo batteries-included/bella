@@ -19,6 +19,18 @@ Bella uses the `telemetry`  library to emit event metrics.
 
 ```elixir
 [
+  [:bella, :task, :stopped],
+  [:bella, :task, :failed],
+  [:bella, :task, :succeeded],
+  [:bella, :task, :unregistered],
+  [:bella, :task, :registered],
+  [:bella, :task, :initialized],
+  [:bella, :scheduler, :binding, :failed],
+  [:bella, :scheduler, :binding, :succeeded],
+  [:bella, :scheduler, :nodes, :fetch, :failed],
+  [:bella, :scheduler, :nodes, :fetch, :succeeded],
+  [:bella, :scheduler, :pods, :fetch, :failed],
+  [:bella, :scheduler, :pods, :fetch, :succeeded],
   [:bella, :reconciler, :genserver, :down],
   [:bella, :reconciler, :reconcile, :failed],
   [:bella, :reconciler, :reconcile, :succeeded],
@@ -27,12 +39,18 @@ Bella uses the `telemetry`  library to emit event metrics.
   [:bella, :reconciler, :fetch, :succeeded],
   [:bella, :reconciler, :initialized],
   [:bella, :watcher, :genserver, :down],
+  [:bella, :watcher, :chunk, :finished],
   [:bella, :watcher, :chunk, :received],
   [:bella, :watcher, :watch, :timedout],
   [:bella, :watcher, :watch, :failed],
+  [:bella, :watcher, :watch, :down],
   [:bella, :watcher, :watch, :finished],
   [:bella, :watcher, :watch, :succeeded],
   [:bella, :watcher, :watch, :started],
+  [:bella, :watcher, :first_resource, :failed],
+  [:bella, :watcher, :first_resource, :succeeded],
+  [:bella, :watcher, :first_resource, :finished],
+  [:bella, :watcher, :first_resource, :started],
   [:bella, :watcher, :initialized]
 ]
 ```
