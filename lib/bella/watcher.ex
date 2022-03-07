@@ -1,7 +1,7 @@
 defmodule Bella.Watcher do
-  @callback operation() :: K8s.Operation.t()
+  @callback operation(Bella.Watcher.State.t()) :: K8s.Operation.t()
 
-  @callback add(map()) :: :ok | :error
-  @callback modify(map()) :: :ok | :error
-  @callback delete(map()) :: :ok | :error
+  @callback add(map(), Bella.Watcher.State.t()) :: :ok | :error
+  @callback modify(map(), Bella.Watcher.State.t()) :: :ok | :error
+  @callback delete(map(), Bella.Watcher.State.t()) :: :ok | :error
 end

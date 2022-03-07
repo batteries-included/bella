@@ -34,8 +34,8 @@ defmodule Bella.Reconciler.Core do
     |> Enum.to_list()
   end
 
-  defp resources(%State{connection: connection, client: client, reconciler: reconciler} = _state) do
-    case reconciler.operation() do
+  defp resources(%State{connection: connection, client: client, reconciler: reconciler} = state) do
+    case reconciler.operation(state) do
       nil ->
         {:ok, []}
 

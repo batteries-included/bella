@@ -13,7 +13,7 @@ defmodule Bella.ReconcilerTest do
     end
 
     @impl true
-    def operation, do: nil
+    def operation(_state), do: nil
 
     def agent_name, do: EverRun
   end
@@ -27,7 +27,7 @@ defmodule Bella.ReconcilerTest do
     end
 
     @impl true
-    def operation, do: K8s.Client.list("reconciler.test.foos/v1", :foos)
+    def operation(_state), do: K8s.Client.list("reconciler.test.foos/v1", :foos)
 
     def agent_name, do: PodCountAgent
   end
