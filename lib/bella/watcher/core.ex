@@ -134,8 +134,8 @@ defmodule Bella.Watcher.Core do
     end)
   end
 
-  defp fetch_resource_version(%{connection: conn, watcher: watcher, client: client} = _state) do
-    with {:ok, payload} <- client.run(conn, watcher.operation()) do
+  defp fetch_resource_version(%{connection: conn, watcher: watcher, client: client} = state) do
+    with {:ok, payload} <- client.run(conn, watcher.operation(state)) do
       rv = ResourceVersion.extract_rv(payload)
       {:ok, rv}
     end
