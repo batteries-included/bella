@@ -19,12 +19,6 @@ Bella uses the `telemetry`  library to emit event metrics.
 
 ```elixir
 [
-  [:bella, :task, :stopped],
-  [:bella, :task, :failed],
-  [:bella, :task, :succeeded],
-  [:bella, :task, :unregistered],
-  [:bella, :task, :registered],
-  [:bella, :task, :initialized],
   [:bella, :scheduler, :binding, :failed],
   [:bella, :scheduler, :binding, :succeeded],
   [:bella, :scheduler, :nodes, :fetch, :failed],

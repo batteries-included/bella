@@ -30,14 +30,12 @@ defmodule Bella.Watcher.State do
     %__MODULE__{
       k8s_watcher_ref: nil,
       buffer: ResponseBuffer.new(),
-
       resource_version: Keyword.get(opts, :resource_version, nil),
       watcher: Keyword.get(opts, :watcher, nil),
       client: Keyword.get(opts, :client, K8s.Client),
       initial_delay: Keyword.get(opts, :initial_delay, @default_initial_delay),
       watch_timeout: Keyword.get(opts, :watch_timeout, @default_watch_timeout),
-
-      connection: Keyword.get_lazy(opts, :connection, fn -> nil end),
+      connection: Keyword.get_lazy(opts, :connection, fn -> nil end)
     }
   end
 
