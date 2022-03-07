@@ -1,9 +1,8 @@
 .PHONY: test lint analyze docs i
 
-all: test lint docs analyze
+all: test lint  format docs analyze
 
 lint:
-	mix format
 	mix credo
 
 test:
@@ -14,3 +13,6 @@ analyze:
 
 docs:
 	mix docs
+
+format:
+	mix format 
