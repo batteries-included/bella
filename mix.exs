@@ -1,6 +1,6 @@
 defmodule Bella.MixProject do
   use Mix.Project
-  @version "0.0.9"
+  @version "0.1.0"
   @source_url "https://github.com/batteries-included/bella"
 
   def project do
