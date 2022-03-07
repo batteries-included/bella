@@ -3,6 +3,7 @@ defmodule Bella.Reconciler.State do
           reconciler: Bella.Reconciler,
           frequency: integer(),
           client: module(),
+          extra: map(),
           connection: K8s.Conn.t() | nil,
           initial_delay: integer()
         }
@@ -13,6 +14,7 @@ defmodule Bella.Reconciler.State do
   defstruct client: nil,
             connection: nil,
             reconciler: nil,
+            extra: %{},
             frequency: @default_frequency,
             initial_delay: @default_initial_delay
 
@@ -22,6 +24,7 @@ defmodule Bella.Reconciler.State do
       client: Keyword.get(opts, :client, K8s.Client),
       connection: Keyword.get_lazy(opts, :connection, fn -> nil end),
       reconciler: Keyword.get(opts, :reconciler, nil),
+      extra: Keyword.get(opts, :extra, %{}),
       frequency: Keyword.get(opts, :frequency, @default_frequency),
       initial_delay: Keyword.get(opts, :initial_delay, @default_initial_delay)
     }

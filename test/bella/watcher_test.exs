@@ -114,6 +114,15 @@ defmodule Bella.WatcherTest do
     end
   end
 
+  describe "Watcher.State" do
+    test "State passes on the extra config" do
+      expected_extra = %{user_data: 100}
+      state = Bella.Watcher.State.new(extra: expected_extra)
+
+      assert state.extra == expected_extra
+    end
+  end
+
   defp event(type) do
     %{
       "object" => %{
