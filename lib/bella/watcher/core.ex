@@ -11,9 +11,9 @@ defmodule Bella.Watcher.Core do
           client: client,
           resource_version: rv,
           watch_timeout: watch_timeout
-        } = _s
+        } = state
       ) do
-    client.watch(conn, watcher.operation(),
+    client.watch(conn, watcher.operation(state),
       params: [resourceVersion: rv],
       stream_to: pid,
       recv_timeout: watch_timeout
@@ -47,7 +47,7 @@ defmodule Bella.Watcher.Core do
     end)
   end
 
-  def process_line(line, %State{resource_version: current_rv, watcher: watcher} = _s) do
+  def process_line(line, %State{resource_version: current_rv} = state) do
     %{"type" => type, "object" => raw_object} = Jason.decode!(line)
 
     case ResourceVersion.extract_rv(raw_object) do
@@ -58,7 +58,7 @@ defmodule Bella.Watcher.Core do
         {:ok, current_rv}
 
       new_rv ->
-        dispatch(%{"type" => type, "object" => raw_object}, watcher)
+        dispatch(%{"type" => type, "object" => raw_object}, state)
         {:ok, new_rv}
     end
   end
@@ -79,8 +79,8 @@ defmodule Bella.Watcher.Core do
     end
   end
 
-  defp first_resources(%State{connection: conn, watcher: watcher, client: client} = _s) do
-    case watcher.operation() do
+  defp first_resources(%State{connection: conn, watcher: watcher, client: client} = state) do
+    case watcher.operation(state) do
       nil ->
         {:ok, []}
 
@@ -89,7 +89,7 @@ defmodule Bella.Watcher.Core do
     end
   end
 
-  defp async_run(resources, measurements, %{watcher: watcher, resource_version: rv} = state) do
+  defp async_run(resources, measurements, %State{watcher: watcher, resource_version: rv} = state) do
     metadata = State.metadata(state)
 
     resources
@@ -99,7 +99,7 @@ defmodule Bella.Watcher.Core do
 
         case is_before(resource, rv) do
           true ->
-            do_dispatch(watcher, :add, resource)
+            do_dispatch(watcher, :add, [resource, state])
 
           _false ->
             Task.async(&do_ok/0)
@@ -117,20 +117,20 @@ defmodule Bella.Watcher.Core do
   @doc """
   Dispatches an `ADDED`, `MODIFIED`, and `DELETED` events to an controller
   """
-  @spec dispatch(map, atom) :: no_return
-  def dispatch(%{"type" => "ADDED", "object" => object}, watcher),
-    do: do_dispatch(watcher, :add, object)
+  @spec dispatch(map, State.t()) :: no_return
+  def dispatch(%{"type" => "ADDED", "object" => object}, %State{watcher: watcher} = state),
+    do: do_dispatch(watcher, :add, [object, state])
 
-  def dispatch(%{"type" => "MODIFIED", "object" => object}, watcher),
-    do: do_dispatch(watcher, :modify, object)
+  def dispatch(%{"type" => "MODIFIED", "object" => object}, %State{watcher: watcher} = state),
+    do: do_dispatch(watcher, :modify, [object, state])
 
-  def dispatch(%{"type" => "DELETED", "object" => object}, watcher),
-    do: do_dispatch(watcher, :delete, object)
+  def dispatch(%{"type" => "DELETED", "object" => object}, %State{watcher: watcher} = state),
+    do: do_dispatch(watcher, :delete, [object, state])
 
-  @spec do_dispatch(atom, atom, map) :: no_return
-  defp do_dispatch(watcher, event, object) do
+  @spec do_dispatch(atom, atom, list()) :: no_return
+  defp do_dispatch(watcher, event, args) do
     Task.async(fn ->
-      apply(watcher, event, [object])
+      apply(watcher, event, args)
     end)
   end
 

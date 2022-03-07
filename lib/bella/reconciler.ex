@@ -1,6 +1,4 @@
 defmodule Bella.Reconciler do
-  alias Bella.Reconciler.State
-
-  @callback operation() :: K8s.Operation.t()
-  @callback reconcile(map(), State) :: no_return()
+  @callback operation(Bella.Reconciler.State.t()) :: K8s.Operation.t()
+  @callback reconcile(map(), Bella.Reconciler.State.t()) :: no_return()
 end

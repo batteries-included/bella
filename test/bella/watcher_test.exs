@@ -11,22 +11,22 @@ defmodule Bella.WatcherTest do
     @behaviour Watcher
 
     @impl true
-    def operation() do
+    def operation(_state) do
       K8s.Client.list("watcher.test/v1", :foos)
     end
 
     @impl true
-    def add(resource) do
+    def add(resource, _state) do
       track_event(:add, resource)
     end
 
     @impl true
-    def modify(resource) do
+    def modify(resource, _state) do
       track_event(:modify, resource)
     end
 
     @impl true
-    def delete(resource) do
+    def delete(resource, _state) do
       track_event(:delete, resource)
     end
 
@@ -45,26 +45,47 @@ defmodule Bella.WatcherTest do
     end
   end
 
-  setup do
-    {:ok, _pid} = TestWatcher.start()
-    :ok
+  def start_test_watcher_cache(_) do
+    {:ok, pid} = TestWatcher.start()
+    {:ok, watcher_cache_pid: pid}
   end
 
-  test "watch/3" do
-    {:ok, pid} =
-      Worker.start_link(watcher: TestWatcher, client: Bella.K8sMockClient, resource_version: "3")
+  def create_state(_) do
+    state =
+      Bella.Watcher.State.new(
+        watcher: TestWatcher,
+        client: Bella.K8sMockClient,
+        resource_version: "3"
+      )
 
-    Watcher.Core.watch(pid, Worker.state(pid))
-    Process.sleep(500)
+    {:ok, state: state}
+  end
 
-    events = TestWatcher.get_events()
-    refute events == []
+  describe "watch/3" do
+    setup [:start_test_watcher_cache]
+
+    test "Events passed on after explicit watch result", _context do
+      {:ok, pid} =
+        Worker.start_link(
+          watcher: TestWatcher,
+          client: Bella.K8sMockClient,
+          resource_version: "3"
+        )
+
+      Watcher.Core.watch(pid, Worker.state(pid))
+      Process.sleep(500)
+
+      events = TestWatcher.get_events()
+      refute events == []
+    end
   end
 
   describe "dispatch/2" do
-    test "dispatches ADDED events to the given module's handler function" do
+    setup [:start_test_watcher_cache, :create_state]
+
+    test "dispatches ADDED events to the given module's handler function", context do
       evt = event("ADDED")
-      Watcher.Core.dispatch(evt, TestWatcher)
+      Watcher.Core.dispatch(evt, context.state)
 
       # Professional.
       :timer.sleep(100)
@@ -72,9 +93,9 @@ defmodule Bella.WatcherTest do
       assert {:add, %{"apiVersion" => "example.com/v1"}} = event
     end
 
-    test "dispatches MODIFIED events to the given module's handler function" do
+    test "dispatches MODIFIED events to the given module's handler function", context do
       evt = event("MODIFIED")
-      Watcher.Core.dispatch(evt, TestWatcher)
+      Watcher.Core.dispatch(evt, context.state)
 
       # Professional.
       :timer.sleep(100)
@@ -82,9 +103,9 @@ defmodule Bella.WatcherTest do
       assert {:modify, %{"apiVersion" => "example.com/v1"}} = event
     end
 
-    test "dispatches DELETED events to the given module's handler function" do
+    test "dispatches DELETED events to the given module's handler function", context do
       evt = event("DELETED")
-      Watcher.Core.dispatch(evt, TestWatcher)
+      Watcher.Core.dispatch(evt, context.state)
 
       # Professional.
       :timer.sleep(100)
