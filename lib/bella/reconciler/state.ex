@@ -20,13 +20,16 @@ defmodule Bella.Reconciler.State do
 
   @spec new(keyword()) :: t()
   def new(opts) do
+    conn_func = Keyword.get(opts, :connection_func, fn -> nil end)
+    conn = Keyword.get_lazy(opts, :connection, conn_func)
+
     %__MODULE__{
       client: Keyword.get(opts, :client, K8s.Client),
-      connection: Keyword.get_lazy(opts, :connection, fn -> nil end),
       reconciler: Keyword.get(opts, :reconciler, nil),
       extra: Keyword.get(opts, :extra, %{}),
       frequency: Keyword.get(opts, :frequency, @default_frequency),
-      initial_delay: Keyword.get(opts, :initial_delay, @default_initial_delay)
+      initial_delay: Keyword.get(opts, :initial_delay, @default_initial_delay),
+      connection: conn
     }
   end
 

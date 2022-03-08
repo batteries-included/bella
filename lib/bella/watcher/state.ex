@@ -29,6 +29,9 @@ defmodule Bella.Watcher.State do
 
   @spec new(keyword()) :: t()
   def new(opts) do
+    conn_func = Keyword.get(opts, :connection_func, fn -> nil end)
+    conn = Keyword.get_lazy(opts, :connection, conn_func)
+
     %__MODULE__{
       k8s_watcher_ref: nil,
       buffer: ResponseBuffer.new(),
@@ -38,7 +41,7 @@ defmodule Bella.Watcher.State do
       extra: Keyword.get(opts, :extra, %{}),
       initial_delay: Keyword.get(opts, :initial_delay, @default_initial_delay),
       watch_timeout: Keyword.get(opts, :watch_timeout, @default_watch_timeout),
-      connection: Keyword.get_lazy(opts, :connection, fn -> nil end)
+      connection: conn
     }
   end
 

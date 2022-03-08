@@ -12,6 +12,7 @@ defmodule Bella.Reconciler.Worker do
       Keyword.split(opts, [
         :client,
         :connection,
+        :connection_func,
         :reconciler,
         :frequency,
         :initial_delay
