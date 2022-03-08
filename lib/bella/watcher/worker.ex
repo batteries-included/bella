@@ -16,6 +16,7 @@ defmodule Bella.Watcher.Worker do
       Keyword.split(opts, [
         :client,
         :connection,
+        :connection_func,
         :watcher,
         :resource_version,
         :watch_timeout,
