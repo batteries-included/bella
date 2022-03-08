@@ -17,6 +17,7 @@ defmodule Bella.Watcher.Worker do
         :client,
         :connection,
         :connection_func,
+        :extra,
         :watcher,
         :resource_version,
         :watch_timeout,

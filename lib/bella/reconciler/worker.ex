@@ -13,6 +13,7 @@ defmodule Bella.Reconciler.Worker do
         :client,
         :connection,
         :connection_func,
+        :extra,
         :reconciler,
         :frequency,
         :initial_delay
