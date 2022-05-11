@@ -95,7 +95,7 @@ defmodule Bella.Watcher.Core do
     resources
     |> Enum.map(fn
       resource when is_map(resource) ->
-        Event.reconciler_fetch_succeeded(measurements, metadata)
+        Event.watcher_fetch_succeeded(measurements, metadata)
 
         case is_before(resource, rv) do
           true ->
@@ -107,7 +107,7 @@ defmodule Bella.Watcher.Core do
 
       {:error, error} ->
         metadata = Map.put(metadata, :error, error)
-        Event.reconciler_fetch_failed(measurements, metadata)
+        Event.watcher_fetch_failed(measurements, metadata)
     end)
     |> Task.await_many()
   end
