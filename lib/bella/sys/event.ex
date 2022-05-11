@@ -13,24 +13,11 @@ defmodule Bella.Sys.Event do
   defevent([:watcher, :watch, :down])
   defevent([:watcher, :watch, :failed])
   defevent([:watcher, :watch, :timedout])
+  defevent([:watcher, :fetch, :failed])
+  defevent([:watcher, :fetch, :succeeded])
   defevent([:watcher, :chunk, :received])
   defevent([:watcher, :chunk, :finished])
   defevent([:watcher, :genserver, :down])
-
-  defevent([:reconciler, :initialized])
-  defevent([:reconciler, :fetch, :succeeded])
-  defevent([:reconciler, :fetch, :failed])
-  defevent([:reconciler, :run, :started])
-  defevent([:reconciler, :reconcile, :succeeded])
-  defevent([:reconciler, :reconcile, :failed])
-  defevent([:reconciler, :genserver, :down])
-
-  defevent([:scheduler, :pods, :fetch, :succeeded])
-  defevent([:scheduler, :pods, :fetch, :failed])
-  defevent([:scheduler, :nodes, :fetch, :succeeded])
-  defevent([:scheduler, :nodes, :fetch, :failed])
-  defevent([:scheduler, :binding, :succeeded])
-  defevent([:scheduler, :binding, :failed])
 
   @doc """
   Measure function execution in _ms_ and return in map w/ results.
