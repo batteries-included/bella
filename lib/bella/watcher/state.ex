@@ -11,11 +11,13 @@ defmodule Bella.Watcher.State do
           extra: map(),
           client: module(),
           connection: K8s.Conn.t() | nil,
-          initial_delay: integer()
+          initial_delay: integer(),
+          retry_watch: boolean()
         }
 
-  @default_initial_delay 500
+  @default_initial_delay 1000
   @default_watch_timeout 64_000
+  @default_should_retry_watch false
 
   defstruct client: nil,
             connection: nil,
@@ -25,7 +27,8 @@ defmodule Bella.Watcher.State do
             resource_version: nil,
             extra: %{},
             watch_timeout: @default_watch_timeout,
-            initial_delay: @default_initial_delay
+            initial_delay: @default_initial_delay,
+            retry_watch: @default_should_retry_watch
 
   @spec new(keyword()) :: t()
   def new(opts) do
@@ -41,6 +44,7 @@ defmodule Bella.Watcher.State do
       extra: Keyword.get(opts, :extra, %{}),
       initial_delay: Keyword.get(opts, :initial_delay, @default_initial_delay),
       watch_timeout: Keyword.get(opts, :watch_timeout, @default_watch_timeout),
+      retry_watch: Keyword.get(opts, :retry_watch, @default_should_retry_watch),
       connection: conn
     }
   end

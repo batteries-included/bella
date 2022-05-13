@@ -20,6 +20,7 @@ defmodule Bella.Watcher.Worker do
         :extra,
         :watcher,
         :resource_version,
+        :retry_watch,
         :watch_timeout,
         :initial_delay
       ])
@@ -45,6 +46,19 @@ defmodule Bella.Watcher.Worker do
     {:reply, state, state}
   end
 
+  defp do_watch(state) do
+    case {is_retryable(state), Core.watch(self(), state)} do
+      {_, {:ok, ref}} ->
+        Event.watcher_watch_started(%{}, State.metadata(state))
+        %State{state | k8s_watcher_ref: ref}
+
+      {true, _} ->
+        Event.watcher_watch_failed(%{}, State.metadata(state))
+        Process.send_after(self(), :watch, 2 * state.initial_delay)
+        %State{state | k8s_watcher_ref: nil}
+    end
+  end
+
   @impl GenServer
   def handle_info(:watch, %State{resource_version: curr_rv} = state) do
     rv = curr_rv || Core.get_resource_version(state)
@@ -54,11 +68,7 @@ defmodule Bella.Watcher.Worker do
       _res = Core.get_before(state)
     end
 
-    Event.watcher_watch_started(%{}, State.metadata(state))
-    {:ok, ref} = Core.watch(self(), state)
-
-    state = %State{state | k8s_watcher_ref: ref}
-    {:noreply, state}
+    {:noreply, do_watch(state)}
   end
 
   @impl GenServer
@@ -138,4 +148,5 @@ defmodule Bella.Watcher.Worker do
   end
 
   defp is_first_watch(previous_rv, new_rv), do: previous_rv == nil && new_rv != nil
+  defp is_retryable(%State{} = state), do: state.retry_watch
 end
