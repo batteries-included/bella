@@ -102,17 +102,17 @@ defmodule Bella.Watcher.Core do
             do_dispatch(watcher, :add, [resource, state])
 
           _false ->
-            Task.async(&do_ok/0)
+            nil
         end
 
       {:error, error} ->
         metadata = Map.put(metadata, :error, error)
         Event.watcher_fetch_failed(measurements, metadata)
+        nil
     end)
+    |> Enum.filter(fn r -> r != nil end)
     |> Task.await_many()
   end
-
-  defp do_ok, do: :ok
 
   @doc """
   Dispatches an `ADDED`, `MODIFIED`, and `DELETED` events to an controller
