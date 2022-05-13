@@ -1,6 +1,6 @@
 defmodule Bella.MixProject do
   use Mix.Project
-  @version "0.1.4"
+  @version "0.1.5"
   @source_url "https://github.com/batteries-included/bella"
 
   def project do
@@ -71,7 +71,7 @@ defmodule Bella.MixProject do
 
   defp description do
     """
-    Bella: Kubernetes Controller Library
+    Bella: Kubernetes Library
     """
   end
 end

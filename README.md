@@ -1,6 +1,6 @@
 # Bella: Kubernetes Controller Framework
 
-Bella make it easy to create Kubernetes Controllers.
+Bella make it easy to create Kubernetes GenServers to watch cluster state.
 
 ## Installation
 
@@ -9,7 +9,7 @@ Bella can be installed by adding `bella` to your list of dependencies in `mix.ex
 ```elixir
 def deps do
   [
-    {:bella, "~> 0.1.4"}
+    {:bella, "~> 0.1.5"}
   ]
 end
 ```
