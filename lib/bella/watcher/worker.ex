@@ -9,21 +9,23 @@ defmodule Bella.Watcher.Worker do
   alias Bella.Watcher.Core
   alias Bella.Watcher.State
 
+  @state_opts [
+    :client,
+    :connection,
+    :connection_func,
+    :extra,
+    :watcher,
+    :resource_version,
+    :should_retry_watch,
+    :watch_timeout,
+    :initial_delay,
+    :max_delay
+  ]
+
   def start_link, do: start_link([])
 
   def start_link(opts) do
-    {state_opts, opts} =
-      Keyword.split(opts, [
-        :client,
-        :connection,
-        :connection_func,
-        :extra,
-        :watcher,
-        :resource_version,
-        :retry_watch,
-        :watch_timeout,
-        :initial_delay
-      ])
+    {state_opts, opts} = Keyword.split(opts, @state_opts)
 
     GenServer.start_link(__MODULE__, state_opts, opts)
   end
@@ -35,10 +37,11 @@ defmodule Bella.Watcher.Worker do
   @impl GenServer
   def init(state_opts) do
     state = State.new(state_opts)
+    delay = State.next_delay(state)
     Event.watcher_initialized(%{}, State.metadata(state))
 
-    Process.send_after(self(), :watch, state.initial_delay)
-    {:ok, state}
+    Process.send_after(self(), :watch, delay)
+    {:ok, %State{state | current_delay: delay}}
   end
 
   @impl GenServer
@@ -47,15 +50,16 @@ defmodule Bella.Watcher.Worker do
   end
 
   defp do_watch(state) do
-    case {is_retryable(state), Core.watch(self(), state)} do
+    case {State.should_retry(state), Core.watch(self(), state)} do
       {_, {:ok, ref}} ->
         Event.watcher_watch_started(%{}, State.metadata(state))
         %State{state | k8s_watcher_ref: ref}
 
       {true, _} ->
+        delay = State.next_delay(state)
         Event.watcher_watch_failed(%{}, State.metadata(state))
-        Process.send_after(self(), :watch, 2 * state.initial_delay)
-        %State{state | k8s_watcher_ref: nil}
+        Process.send_after(self(), :watch, delay)
+        %State{state | k8s_watcher_ref: nil, current_delay: delay}
     end
   end
 
@@ -148,5 +152,4 @@ defmodule Bella.Watcher.Worker do
   end
 
   defp is_first_watch(previous_rv, new_rv), do: previous_rv == nil && new_rv != nil
-  defp is_retryable(%State{} = state), do: state.retry_watch
 end
