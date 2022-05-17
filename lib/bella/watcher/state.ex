@@ -66,7 +66,7 @@ defmodule Bella.Watcher.State do
       ) do
     jitter = :rand.uniform() * 0.5
     jitter_ammount = jitter * initial_delay
-    round(max(current_delay, max_delay) + jitter_ammount)
+    round(min(current_delay, max_delay) + jitter_ammount)
   end
 
   @spec metadata(t()) :: map()
