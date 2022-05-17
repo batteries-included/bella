@@ -3,7 +3,6 @@ defmodule Bella.WatcherTest do
   use ExUnit.Case, async: true
 
   alias Bella.Watcher
-  alias Bella.Watcher.Worker
 
   doctest Bella.Watcher
 
@@ -59,25 +58,6 @@ defmodule Bella.WatcherTest do
       )
 
     {:ok, state: state}
-  end
-
-  describe "watch/3" do
-    setup [:start_test_watcher_cache]
-
-    test "Events passed on after explicit watch result", _context do
-      {:ok, pid} =
-        Worker.start_link(
-          watcher: TestWatcher,
-          client: Bella.K8sMockClient,
-          resource_version: "3"
-        )
-
-      Watcher.Core.watch(pid, Worker.state(pid))
-      Process.sleep(500)
-
-      events = TestWatcher.get_events()
-      refute events == []
-    end
   end
 
   describe "dispatch/2" do

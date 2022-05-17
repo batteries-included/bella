@@ -37,11 +37,9 @@ defmodule Bella.Watcher.Worker do
   @impl GenServer
   def init(state_opts) do
     state = State.new(state_opts)
-    delay = State.next_delay(state)
     Event.watcher_initialized(%{}, State.metadata(state))
-
-    Process.send_after(self(), :watch, delay)
-    {:ok, %State{state | current_delay: delay}}
+    Process.send_after(self(), :watch, state.initial_delay)
+    {:ok, %State{state | current_delay: state.initial_delay}}
   end
 
   @impl GenServer
